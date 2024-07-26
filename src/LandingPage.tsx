@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "./components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card";
@@ -8,7 +8,6 @@ const LandingPage: React.FC = () => {
   const [companyName, setCompanyName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [generatedLinks, setGeneratedLinks] = useState({ team: '', clients: '' });
-  const [previewLinks, setPreviewLinks] = useState({ team: '', clients: '' });
   const navigate = useNavigate();
 
   const handleCompanyNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -20,55 +19,23 @@ const LandingPage: React.FC = () => {
     return `/${type}?company=${encodedCompanyName}`;
   };
 
-  useEffect(() => {
-    const teamLink = getAppUrl('team');
-    const clientsLink = getAppUrl('clients');
-    setPreviewLinks({ team: teamLink, clients: clientsLink });
-  }, [companyName]);
+  const openFeedbackPage = (url: string) => {
+    window.open(url, '_blank');
+  };
 
   const generateLinks = () => {
     setIsLoading(true);
     // Simulating an API call or some processing time
     setTimeout(() => {
-      setGeneratedLinks(previewLinks);
+      const teamLink = getAppUrl('team');
+      const clientsLink = getAppUrl('clients');
+      setGeneratedLinks({ team: teamLink, clients: clientsLink });
       setIsLoading(false);
     }, 1500); // 1.5 seconds delay to simulate processing
   };
 
-  const openFeedbackPage = (url: string) => {
-    navigate(url);
-  };
-
-  const renderLink = (type: 'team' | 'clients') => {
-    const link = generatedLinks[type] || previewLinks[type];
-    const isGenerated = !!generatedLinks[type];
-    const fullUrl = `${window.location.origin}${link}`;
-    
-    return (
-      <div className="text-left mb-4">
-        <p className="mb-1 text-sm font-medium">Link to collect feedback from your {type}:</p>
-        {isGenerated ? (
-          <a 
-            href={link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-blue-600 cursor-pointer hover:underline"
-            onClick={(e) => {
-              e.preventDefault();
-              openFeedbackPage(link);
-              window.open(fullUrl, '_blank');
-            }}
-          >
-            {fullUrl}
-          </a>
-        ) : (
-          <span className="text-sm text-black cursor-default">
-            {fullUrl}
-          </span>
-        )}
-      </div>
-    );
-  };
+  const previewTeamLink = getAppUrl('team');
+  const previewClientsLink = getAppUrl('clients');
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-pink-100 font-sans">
@@ -113,8 +80,24 @@ const LandingPage: React.FC = () => {
               value={companyName}
               onChange={handleCompanyNameChange}
             />
-            {renderLink('team')}
-            {renderLink('clients')}
+            <div className="text-left mb-4">
+              <p className="mb-1 text-sm font-medium">Link to collect feedback from your team:</p>
+              <p 
+                className={`text-sm ${generatedLinks.team ? 'text-blue-600 cursor-pointer hover:underline' : 'text-black'}`}
+                onClick={() => generatedLinks.team && openFeedbackPage(window.location.origin + generatedLinks.team)}
+              >
+                {window.location.origin + previewTeamLink}
+              </p>
+            </div>
+            <div className="text-left mb-6">
+              <p className="mb-1 text-sm font-medium">Link to collect feedback from your clients:</p>
+              <p 
+                className={`text-sm ${generatedLinks.clients ? 'text-blue-600 cursor-pointer hover:underline' : 'text-black'}`}
+                onClick={() => generatedLinks.clients && openFeedbackPage(window.location.origin + generatedLinks.clients)}
+              >
+                {window.location.origin + previewClientsLink}
+              </p>
+            </div>
             <Button 
               className="w-full bg-gray-900 text-white hover:bg-gray-700 py-2 text-sm font-semibold"
               onClick={generateLinks}
