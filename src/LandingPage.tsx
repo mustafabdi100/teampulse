@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "./components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card";
 import { Input } from "./components/ui/input";
@@ -9,6 +9,7 @@ const LandingPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [generatedLinks, setGeneratedLinks] = useState({ team: '', clients: '' });
   const [previewLinks, setPreviewLinks] = useState({ team: '', clients: '' });
+  const navigate = useNavigate();
 
   const handleCompanyNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCompanyName(e.target.value);
@@ -34,6 +35,10 @@ const LandingPage: React.FC = () => {
     }, 1500); // 1.5 seconds delay to simulate processing
   };
 
+  const openFeedbackPage = (url: string) => {
+    navigate(url);
+  };
+
   const renderLink = (type: 'team' | 'clients') => {
     const link = generatedLinks[type] || previewLinks[type];
     const isGenerated = !!generatedLinks[type];
@@ -42,15 +47,25 @@ const LandingPage: React.FC = () => {
     return (
       <div className="text-left mb-4">
         <p className="mb-1 text-sm font-medium">Link to collect feedback from your {type}:</p>
-        <a 
-          href={isGenerated ? fullUrl : undefined}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={`text-sm ${isGenerated ? 'text-blue-600 cursor-pointer hover:underline' : 'text-black cursor-default'}`}
-          onClick={(e) => !isGenerated && e.preventDefault()}
-        >
-          {fullUrl}
-        </a>
+        {isGenerated ? (
+          <a 
+            href={link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-blue-600 cursor-pointer hover:underline"
+            onClick={(e) => {
+              e.preventDefault();
+              openFeedbackPage(link);
+              window.open(fullUrl, '_blank');
+            }}
+          >
+            {fullUrl}
+          </a>
+        ) : (
+          <span className="text-sm text-black cursor-default">
+            {fullUrl}
+          </span>
+        )}
       </div>
     );
   };
