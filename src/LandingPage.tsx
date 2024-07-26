@@ -1,34 +1,34 @@
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "./components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card";
 import { Input } from "./components/ui/input";
-import { Link } from 'react-router-dom';
 
 const LandingPage: React.FC = () => {
   const [companyName, setCompanyName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [generatedLinks, setGeneratedLinks] = useState({ team: '', clients: '' });
+  const navigate = useNavigate();
 
   const handleCompanyNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCompanyName(e.target.value);
   };
 
-  const getNetlifyUrl = (type: string) => {
-    const baseUrl = 'https://teampulsee.netlify.app';
+  const getAppUrl = (type: string) => {
     const encodedCompanyName = encodeURIComponent(companyName.trim() || 'default');
-    return `${baseUrl}/${type}?company=${encodedCompanyName}`;
+    return `/${type}?company=${encodedCompanyName}`;
   };
 
-  const openInNewTab = (url: string) => {
-    window.open(url, '_blank', 'noopener,noreferrer');
+  const openFeedbackPage = (url: string) => {
+    navigate(url);
   };
 
   const generateLinks = () => {
     setIsLoading(true);
     // Simulating an API call or some processing time
     setTimeout(() => {
-      const teamLink = getNetlifyUrl('team');
-      const clientsLink = getNetlifyUrl('clients');
+      const teamLink = getAppUrl('team');
+      const clientsLink = getAppUrl('clients');
       setGeneratedLinks({ team: teamLink, clients: clientsLink });
       setIsLoading(false);
     }, 1500); // 1.5 seconds delay to simulate processing
@@ -82,9 +82,9 @@ const LandingPage: React.FC = () => {
                 <p className="mb-1 text-sm font-medium">Link to collect feedback from your team:</p>
                 <p 
                   className="text-sm text-blue-600 cursor-pointer hover:underline"
-                  onClick={() => openInNewTab(generatedLinks.team)}
+                  onClick={() => openFeedbackPage(generatedLinks.team)}
                 >
-                  {generatedLinks.team}
+                  {window.location.origin + generatedLinks.team}
                 </p>
               </div>
             )}
@@ -93,9 +93,9 @@ const LandingPage: React.FC = () => {
                 <p className="mb-1 text-sm font-medium">Link to collect feedback from your clients:</p>
                 <p 
                   className="text-sm text-blue-600 cursor-pointer hover:underline"
-                  onClick={() => openInNewTab(generatedLinks.clients)}
+                  onClick={() => openFeedbackPage(generatedLinks.clients)}
                 >
-                  {generatedLinks.clients}
+                  {window.location.origin + generatedLinks.clients}
                 </p>
               </div>
             )}
