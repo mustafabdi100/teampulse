@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from "./components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card";
 import { Input } from "./components/ui/input";
@@ -8,7 +8,7 @@ const LandingPage: React.FC = () => {
   const [companyName, setCompanyName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [generatedLinks, setGeneratedLinks] = useState({ team: '', clients: '' });
-  const navigate = useNavigate();
+  const [previewLinks, setPreviewLinks] = useState({ team: '', clients: '' });
 
   const handleCompanyNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCompanyName(e.target.value);
@@ -19,19 +19,40 @@ const LandingPage: React.FC = () => {
     return `/${type}?company=${encodedCompanyName}`;
   };
 
-  const openFeedbackPage = (url: string) => {
-    navigate(url);
-  };
+  useEffect(() => {
+    const teamLink = getAppUrl('team');
+    const clientsLink = getAppUrl('clients');
+    setPreviewLinks({ team: teamLink, clients: clientsLink });
+  }, [companyName]);
 
   const generateLinks = () => {
     setIsLoading(true);
     // Simulating an API call or some processing time
     setTimeout(() => {
-      const teamLink = getAppUrl('team');
-      const clientsLink = getAppUrl('clients');
-      setGeneratedLinks({ team: teamLink, clients: clientsLink });
+      setGeneratedLinks(previewLinks);
       setIsLoading(false);
     }, 1500); // 1.5 seconds delay to simulate processing
+  };
+
+  const renderLink = (type: 'team' | 'clients') => {
+    const link = generatedLinks[type] || previewLinks[type];
+    const isGenerated = !!generatedLinks[type];
+    const fullUrl = `${window.location.origin}${link}`;
+    
+    return (
+      <div className="text-left mb-4">
+        <p className="mb-1 text-sm font-medium">Link to collect feedback from your {type}:</p>
+        <a 
+          href={isGenerated ? fullUrl : undefined}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`text-sm ${isGenerated ? 'text-blue-600 cursor-pointer hover:underline' : 'text-black cursor-default'}`}
+          onClick={(e) => !isGenerated && e.preventDefault()}
+        >
+          {fullUrl}
+        </a>
+      </div>
+    );
   };
 
   return (
@@ -77,28 +98,8 @@ const LandingPage: React.FC = () => {
               value={companyName}
               onChange={handleCompanyNameChange}
             />
-            {generatedLinks.team && (
-              <div className="text-left mb-4">
-                <p className="mb-1 text-sm font-medium">Link to collect feedback from your team:</p>
-                <p 
-                  className="text-sm text-blue-600 cursor-pointer hover:underline"
-                  onClick={() => openFeedbackPage(generatedLinks.team)}
-                >
-                  {window.location.origin + generatedLinks.team}
-                </p>
-              </div>
-            )}
-            {generatedLinks.clients && (
-              <div className="text-left mb-6">
-                <p className="mb-1 text-sm font-medium">Link to collect feedback from your clients:</p>
-                <p 
-                  className="text-sm text-blue-600 cursor-pointer hover:underline"
-                  onClick={() => openFeedbackPage(generatedLinks.clients)}
-                >
-                  {window.location.origin + generatedLinks.clients}
-                </p>
-              </div>
-            )}
+            {renderLink('team')}
+            {renderLink('clients')}
             <Button 
               className="w-full bg-gray-900 text-white hover:bg-gray-700 py-2 text-sm font-semibold"
               onClick={generateLinks}
