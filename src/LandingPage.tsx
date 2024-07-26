@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+mport React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "./components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card";
@@ -16,11 +16,11 @@ const LandingPage: React.FC = () => {
 
   const getAppUrl = (type: string) => {
     const encodedCompanyName = encodeURIComponent(companyName.trim() || 'default');
-    return `/${type}?company=${encodedCompanyName}`;
+    return /${type}?company=${encodedCompanyName};
   };
 
   const openFeedbackPage = (url: string) => {
-    window.open(url, '_blank');
+    navigate(url);
   };
 
   const generateLinks = () => {
@@ -33,9 +33,6 @@ const LandingPage: React.FC = () => {
       setIsLoading(false);
     }, 1500); // 1.5 seconds delay to simulate processing
   };
-
-  const previewTeamLink = getAppUrl('team');
-  const previewClientsLink = getAppUrl('clients');
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-pink-100 font-sans">
@@ -80,24 +77,28 @@ const LandingPage: React.FC = () => {
               value={companyName}
               onChange={handleCompanyNameChange}
             />
-            <div className="text-left mb-4">
-              <p className="mb-1 text-sm font-medium">Link to collect feedback from your team:</p>
-              <p 
-                className={`text-sm ${generatedLinks.team ? 'text-blue-600 cursor-pointer hover:underline' : 'text-black'}`}
-                onClick={() => generatedLinks.team && openFeedbackPage(window.location.origin + generatedLinks.team)}
-              >
-                {window.location.origin + previewTeamLink}
-              </p>
-            </div>
-            <div className="text-left mb-6">
-              <p className="mb-1 text-sm font-medium">Link to collect feedback from your clients:</p>
-              <p 
-                className={`text-sm ${generatedLinks.clients ? 'text-blue-600 cursor-pointer hover:underline' : 'text-black'}`}
-                onClick={() => generatedLinks.clients && openFeedbackPage(window.location.origin + generatedLinks.clients)}
-              >
-                {window.location.origin + previewClientsLink}
-              </p>
-            </div>
+            {generatedLinks.team && (
+              <div className="text-left mb-4">
+                <p className="mb-1 text-sm font-medium">Link to collect feedback from your team:</p>
+                <p 
+                  className="text-sm text-blue-600 cursor-pointer hover:underline"
+                  onClick={() => openFeedbackPage(generatedLinks.team)}
+                >
+                  {window.location.origin + generatedLinks.team}
+                </p>
+              </div>
+            )}
+            {generatedLinks.clients && (
+              <div className="text-left mb-6">
+                <p className="mb-1 text-sm font-medium">Link to collect feedback from your clients:</p>
+                <p 
+                  className="text-sm text-blue-600 cursor-pointer hover:underline"
+                  onClick={() => openFeedbackPage(generatedLinks.clients)}
+                >
+                  {window.location.origin + generatedLinks.clients}
+                </p>
+              </div>
+            )}
             <Button 
               className="w-full bg-gray-900 text-white hover:bg-gray-700 py-2 text-sm font-semibold"
               onClick={generateLinks}
