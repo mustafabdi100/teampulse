@@ -6,19 +6,32 @@ import { Link } from 'react-router-dom';
 
 const LandingPage: React.FC = () => {
   const [companyName, setCompanyName] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [generatedLinks, setGeneratedLinks] = useState({ team: '', clients: '' });
 
   const handleCompanyNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCompanyName(e.target.value);
   };
 
-  const getLocalUrl = (type: string) => {
-    const baseUrl = 'http://localhost:5173';
+  const getNetlifyUrl = (type: string) => {
+    const baseUrl = 'https://teampulsee.netlify.app';
     const encodedCompanyName = encodeURIComponent(companyName.trim() || 'default');
     return `${baseUrl}/${type}?company=${encodedCompanyName}`;
   };
 
   const openInNewTab = (url: string) => {
     window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
+  const generateLinks = () => {
+    setIsLoading(true);
+    // Simulating an API call or some processing time
+    setTimeout(() => {
+      const teamLink = getNetlifyUrl('team');
+      const clientsLink = getNetlifyUrl('clients');
+      setGeneratedLinks({ team: teamLink, clients: clientsLink });
+      setIsLoading(false);
+    }, 1500); // 1.5 seconds delay to simulate processing
   };
 
   return (
@@ -56,7 +69,7 @@ const LandingPage: React.FC = () => {
           </CardHeader>
           <CardContent className="p-6">
             <p className="text-sm text-gray-500 mb-6">
-              These are local development portals for testing purposes.
+              Generate links to collect feedback from your team and clients.
             </p>
             <Input 
               placeholder="Your company name" 
@@ -64,26 +77,34 @@ const LandingPage: React.FC = () => {
               value={companyName}
               onChange={handleCompanyNameChange}
             />
-            <div className="text-left mb-4">
-              <p className="mb-1 text-sm font-medium">Link to collect feedback from your team:</p>
-              <p 
-                className="text-sm text-blue-600 cursor-pointer hover:underline"
-                onClick={() => openInNewTab(getLocalUrl('team'))}
-              >
-                {getLocalUrl('team')}
-              </p>
-            </div>
-            <div className="text-left mb-6">
-              <p className="mb-1 text-sm font-medium">Link to collect feedback from your clients:</p>
-              <p 
-                className="text-sm text-blue-600 cursor-pointer hover:underline"
-                onClick={() => openInNewTab(getLocalUrl('clients'))}
-              >
-                {getLocalUrl('clients')}
-              </p>
-            </div>
-            <Button className="w-full bg-gray-900 text-white hover:bg-gray-700 py-2 text-sm font-semibold">
-              Generate Links
+            {generatedLinks.team && (
+              <div className="text-left mb-4">
+                <p className="mb-1 text-sm font-medium">Link to collect feedback from your team:</p>
+                <p 
+                  className="text-sm text-blue-600 cursor-pointer hover:underline"
+                  onClick={() => openInNewTab(generatedLinks.team)}
+                >
+                  {generatedLinks.team}
+                </p>
+              </div>
+            )}
+            {generatedLinks.clients && (
+              <div className="text-left mb-6">
+                <p className="mb-1 text-sm font-medium">Link to collect feedback from your clients:</p>
+                <p 
+                  className="text-sm text-blue-600 cursor-pointer hover:underline"
+                  onClick={() => openInNewTab(generatedLinks.clients)}
+                >
+                  {generatedLinks.clients}
+                </p>
+              </div>
+            )}
+            <Button 
+              className="w-full bg-gray-900 text-white hover:bg-gray-700 py-2 text-sm font-semibold"
+              onClick={generateLinks}
+              disabled={isLoading}
+            >
+              {isLoading ? "Loading..." : "Generate Links"}
             </Button>
           </CardContent>
         </Card>
