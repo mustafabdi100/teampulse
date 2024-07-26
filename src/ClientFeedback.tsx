@@ -6,6 +6,7 @@ import { Button } from "./components/ui/button";
 import { Textarea } from "./components/ui/textarea";
 import { Alert, AlertTitle, AlertDescription } from "./components/ui/alert";
 import { useToast } from "./components/ui/use-toast";
+import { Toaster } from "./components/ui/toaster";
 
 const ClientFeedback: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -71,6 +72,7 @@ const ClientFeedback: React.FC = () => {
           </form>
         </CardContent>
       </Card>
+      <Toaster />
     </div>
   );
 };
